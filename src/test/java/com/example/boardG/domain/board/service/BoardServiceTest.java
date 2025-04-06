@@ -1,5 +1,6 @@
 package com.example.boardG.domain.board.service;
 
+import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
@@ -56,6 +57,34 @@ class BoardServiceTest {
         assertThat(boards.get(0).getTitle()).isEqualTo("Test Title");
         assertThat(boards.get(0).getContent()).isEqualTo("Test Content");
         assertThat(boards.get(0).getMember().getId()).isEqualTo(member.getId());
+    }
+
+    @DisplayName("특정 게시글을 boardId로 조회한다.")
+    @Test
+    void getBoardInfo() {
+        Member member = Member.builder()
+                .username("Test")
+                .password("Test")
+                .email("Test@test.com")
+                .build();
+
+        memberRepository.save(member);
+
+        BoardSaveRequestDto boardSaveRequestDto = BoardSaveRequestDto.builder()
+                .memberId(member.getId())
+                .title("Test Title")
+                .content("Test Content")
+                .build();
+
+        boardService.createBoard(member.getId(), boardSaveRequestDto);
+
+        Board savedBoard = boardRepository.findAll().get(0);
+
+        BoardInfoRequestDto boardInfoRequestDto = boardService.getBoardInfo(savedBoard.getId());
+
+        assertThat(boardInfoRequestDto.title()).isEqualTo("Test Title");
+        assertThat(boardInfoRequestDto.content()).isEqualTo("Test Content");
+        assertThat(boardInfoRequestDto.memberId()).isEqualTo(member.getId());
     }
 
 }
