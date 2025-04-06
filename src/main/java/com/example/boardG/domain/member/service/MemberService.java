@@ -62,4 +62,12 @@ public class MemberService {
                 memberUpdateRequestDto.email());
     }
 
+    @Transactional
+    public void delete(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        memberRepository.delete(member);
+    }
+
 }

@@ -164,4 +164,23 @@ class MemberServiceTest {
         assertThat(memberUpdateRequestDto.email()).isEqualTo("updated@email.com");
     }
 
+    @DisplayName("회원 탈퇴를 진행한다.")
+    @Test
+    void deleteMember() {
+        Member member = Member.builder()
+                .username("Test")
+                .password("Test")
+                .email("Test@test.com")
+                .build();
+
+        memberRepository.save(member);
+
+        Long memberId = member.getId();
+
+        memberService.delete(memberId);
+
+        Optional<Member> deletedMember = memberRepository.findById(memberId);
+        assertThat(deletedMember).isNotPresent();
+    }
+
 }

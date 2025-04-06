@@ -32,4 +32,10 @@ public class MemberController {
         return ResponseEntity.ok("회원 수정 성공");
     }
 
+    @DeleteMapping("{memberId}")
+    public ResponseEntity<?> delete(@PathVariable("memberId") Long memberId) {
+        memberService.delete(memberId);
+        return ResponseEntity.ok("회원 삭제 성공");
+    }
+
 }
