@@ -1,11 +1,13 @@
 package com.example.boardG.domain.member.service;
 
+import com.example.boardG.domain.member.dto.MemberUpdateRequestDto;
 import com.example.boardG.domain.member.dto.SignInRequestDto;
 import com.example.boardG.domain.member.dto.SignUpRequestDto;
 import com.example.boardG.domain.member.entity.Member;
 import com.example.boardG.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -47,6 +49,17 @@ public class MemberService {
 
         return "로그인 성공";
 
+    }
+
+    @Transactional
+    public void update(Long memberId, MemberUpdateRequestDto memberUpdateRequestDto) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        member.updateMember(memberUpdateRequestDto.username(),
+                memberUpdateRequestDto.password(),
+                memberUpdateRequestDto.email());
     }
 
 }

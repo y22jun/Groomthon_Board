@@ -1,5 +1,6 @@
 package com.example.boardG.domain.member.service;
 
+import com.example.boardG.domain.member.dto.MemberUpdateRequestDto;
 import com.example.boardG.domain.member.dto.SignInRequestDto;
 import com.example.boardG.domain.member.dto.SignUpRequestDto;
 import com.example.boardG.domain.member.entity.Member;
@@ -137,6 +138,30 @@ class MemberServiceTest {
         assertThatThrownBy(() -> memberService.signIn(signInRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("비밀번호가 틀렸습니다.");
+    }
+
+    @DisplayName("회원 정보를 수정한다.")
+    @Test
+    void updateMember() {
+        Member member = Member.builder()
+                .username("Test")
+                .password("Test")
+                .email("Test@test.com")
+                .build();
+
+        memberRepository.save(member);
+
+        MemberUpdateRequestDto memberUpdateRequestDto = MemberUpdateRequestDto.builder()
+                .username("UpdatedUser")
+                .password("updatedPass")
+                .email("updated@email.com")
+                .build();
+
+        memberService.update(member.getId(), memberUpdateRequestDto);
+
+        assertThat(memberUpdateRequestDto.username()).isEqualTo("UpdatedUser");
+        assertThat(memberUpdateRequestDto.password()).isEqualTo("updatedPass");
+        assertThat(memberUpdateRequestDto.email()).isEqualTo("updated@email.com");
     }
 
 }
