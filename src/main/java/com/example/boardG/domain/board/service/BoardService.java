@@ -36,7 +36,11 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다"));
 
-        return BoardInfoRequestDto.from(board);
+        return BoardInfoRequestDto.builder()
+                .memberId(board.getMember().getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .build();
     }
 
 }
