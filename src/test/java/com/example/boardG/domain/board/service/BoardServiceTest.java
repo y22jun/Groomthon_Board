@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class BoardServiceTest {
@@ -31,18 +30,14 @@ class BoardServiceTest {
 
     @AfterEach
     void tearDown() {
+        memberRepository.deleteAllInBatch();
         boardRepository.deleteAllInBatch();
     }
 
     @DisplayName("새로운 게시글을 생성한다.")
     @Test
     void createBoard() {
-        Member member = Member.builder()
-                .username("Test")
-                .password("Test")
-                .email("Test@test.com")
-                .build();
-
+        Member member = getNewMember();
         memberRepository.save(member);
 
         BoardSaveRequestDto boardSaveRequestDto = BoardSaveRequestDto.builder()
@@ -62,12 +57,7 @@ class BoardServiceTest {
     @DisplayName("특정 게시글을 boardId로 조회한다.")
     @Test
     void getBoardInfo() {
-        Member member = Member.builder()
-                .username("Test")
-                .password("Test")
-                .email("Test@test.com")
-                .build();
-
+        Member member = getNewMember();
         memberRepository.save(member);
 
         BoardSaveRequestDto boardSaveRequestDto = BoardSaveRequestDto.builder()
@@ -85,6 +75,14 @@ class BoardServiceTest {
         assertThat(boardInfoRequestDto.title()).isEqualTo("Test Title");
         assertThat(boardInfoRequestDto.content()).isEqualTo("Test Content");
         assertThat(boardInfoRequestDto.memberId()).isEqualTo(member.getId());
+    }
+
+    static Member getNewMember() {
+        return Member.builder()
+                .username("Test")
+                .password("Test")
+                .email("Test@test.com")
+                .build();
     }
 
 }
