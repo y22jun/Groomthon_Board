@@ -2,6 +2,7 @@ package com.example.boardG.domain.board.service;
 
 import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
+import com.example.boardG.domain.board.dto.BoardUpdateRequestDto;
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
 import com.example.boardG.domain.member.entity.Member;
@@ -30,8 +31,8 @@ class BoardServiceTest {
 
     @AfterEach
     void tearDown() {
-        memberRepository.deleteAllInBatch();
         boardRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @DisplayName("새로운 게시글을 생성한다.")
@@ -75,6 +76,33 @@ class BoardServiceTest {
         assertThat(boardInfoRequestDto.title()).isEqualTo("Test Title");
         assertThat(boardInfoRequestDto.content()).isEqualTo("Test Content");
         assertThat(boardInfoRequestDto.memberId()).isEqualTo(member.getId());
+    }
+
+    @DisplayName("특정 게시글을 수정한다.")
+    @Test
+    void updateBoard() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        BoardSaveRequestDto boardSaveRequestDto = BoardSaveRequestDto.builder()
+                .memberId(member.getId())
+                .title("Original Title")
+                .content("Original Content")
+                .build();
+
+        boardService.createBoard(member.getId(), boardSaveRequestDto);
+        Board savedBoard = boardRepository.findAll().get(0);
+
+        BoardUpdateRequestDto updateRequestDto = BoardUpdateRequestDto.builder()
+                .title("Updated Title")
+                .content("Updated Content")
+                .build();
+
+        boardService.updateBoard(member.getId(), savedBoard.getId(), updateRequestDto);
+
+        Board updatedBoard = boardRepository.findById(savedBoard.getId()).orElseThrow();
+        assertThat(updatedBoard.getTitle()).isEqualTo("Updated Title");
+        assertThat(updatedBoard.getContent()).isEqualTo("Updated Content");
     }
 
     static Member getNewMember() {

@@ -41,12 +41,10 @@ class MemberServiceTest {
 
         memberService.signUp(signUpRequestDto);
 
-        Long memberId = 1L;
-        Optional<Member> member = memberRepository.findById(memberId);
+        Optional<Member> member = memberRepository.findByEmail("Test@test.com");
 
         assertThat(member).isPresent();
         assertThat(member.get().getUsername()).isEqualTo(signUpRequestDto.username());
-
     }
 
     @DisplayName("이미 존재하는 이메일로 회원 가입을 시도하면 예외가 발생한다.")
@@ -164,6 +162,29 @@ class MemberServiceTest {
         assertThat(memberUpdateRequestDto.email()).isEqualTo("updated@email.com");
     }
 
+    @DisplayName("존재하지 않는 회원 정보를 수정하려고 하면 예외가 발생한다.")
+    @Test
+    void updateMemberThrowExceptionCausedByDuplicateId() {
+        Member member = Member.builder()
+                .username("Test")
+                .password("Test")
+                .email("Test@test.com")
+                .build();
+        memberRepository.save(member);
+
+        Long invalidMemberId = 999L;
+
+        MemberUpdateRequestDto memberUpdateRequestDto = MemberUpdateRequestDto.builder()
+                .username("UpdatedUser")
+                .password("updatedPass")
+                .email("updated@email.com")
+                .build();
+
+        assertThatThrownBy(() -> memberService.update(invalidMemberId, memberUpdateRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
+    }
+
     @DisplayName("회원 탈퇴를 진행한다.")
     @Test
     void deleteMember() {
@@ -181,6 +202,23 @@ class MemberServiceTest {
 
         Optional<Member> deletedMember = memberRepository.findById(memberId);
         assertThat(deletedMember).isNotPresent();
+    }
+
+    @DisplayName("존재하지 않는 회원을 탈퇴하려고 하면 예외가 발생한다.")
+    @Test
+    void deleteMemberThrowExceptionCausedByDuplicateId() {
+        Member member = Member.builder()
+                .username("Test")
+                .password("Test")
+                .email("Test@test.com")
+                .build();
+        memberRepository.save(member);
+
+        Long invalidMemberId = 999L;
+
+        assertThatThrownBy(() -> memberService.delete(invalidMemberId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
     }
 
 }
