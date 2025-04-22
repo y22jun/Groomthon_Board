@@ -47,7 +47,7 @@ public class BoardService {
     @Transactional
     public void updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
         memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원압니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다"));

@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class BoardServiceTest {
@@ -103,6 +104,31 @@ class BoardServiceTest {
         Board updatedBoard = boardRepository.findById(savedBoard.getId()).orElseThrow();
         assertThat(updatedBoard.getTitle()).isEqualTo("Updated Title");
         assertThat(updatedBoard.getContent()).isEqualTo("Updated Content");
+    }
+
+    @DisplayName("존재하지 않는 회원으로 게시글을 수정하려고 할 때 예외가 발생한다.")
+    @Test
+    void updateBoardMemberIdThrowExceptionCausedByDuplicateId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = Board.builder()
+                .title("Title")
+                .content("Content")
+                .member(member)
+                .build();
+        boardRepository.save(board);
+
+        BoardUpdateRequestDto updateDto = BoardUpdateRequestDto.builder()
+                .title("Updated Title")
+                .content("Updated Content")
+                .build();
+
+        Long invalidMemberId = 999L;
+
+        assertThatThrownBy(() -> boardService.updateBoard(invalidMemberId, board.getId(), updateDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
     }
 
     static Member getNewMember() {
