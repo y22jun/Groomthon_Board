@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/boards")
 @RestController
@@ -38,6 +40,11 @@ public class BoardController {
     public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, @RequestBody BoardDeleteRequestDto boardDeleteRequestDto) {
         boardService.deleteBoard(boardDeleteRequestDto.memberId(), boardId);
         return ResponseEntity.ok("게시판 삭제 성공");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BoardInfoRequestDto>> getBoards() {
+        return ResponseEntity.ok(boardService.getAllBoards());
     }
 
 }

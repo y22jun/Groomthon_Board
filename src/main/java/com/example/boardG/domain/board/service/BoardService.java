@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class BoardService {
@@ -64,6 +67,17 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
         boardRepository.delete(board);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BoardInfoRequestDto> getAllBoards() {
+        return boardRepository.findAll().stream()
+                .map(board -> BoardInfoRequestDto.builder()
+                        .memberId(board.getMember().getId())
+                        .title(board.getTitle())
+                        .content(board.getContent())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 }

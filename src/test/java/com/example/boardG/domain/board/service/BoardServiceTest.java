@@ -217,6 +217,36 @@ class BoardServiceTest {
                 .hasMessage("해당 게시글을 찾을 수 없습니다.");
     }
 
+    @DisplayName("모든 게시글을 조회한다.")
+    @Test
+    void getAllBoards() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        BoardSaveRequestDto boardSaveRequestDto1 = BoardSaveRequestDto.builder()
+                .memberId(member.getId())
+                .title("Test Title1")
+                .content("Test Content1")
+                .build();
+        boardService.createBoard(member.getId(), boardSaveRequestDto1);
+
+        BoardSaveRequestDto boardSaveRequestDto2 = BoardSaveRequestDto.builder()
+                .memberId(member.getId())
+                .title("Test Title2")
+                .content("Test Content2")
+                .build();
+        boardService.createBoard(member.getId(), boardSaveRequestDto2);
+
+        List<Board> boards = boardRepository.findAll();
+        assertThat(boards).hasSize(2);
+
+        assertThat(boards.get(0).getTitle()).isEqualTo("Test Title1");
+        assertThat(boards.get(0).getContent()).isEqualTo("Test Content1");
+
+        assertThat(boards.get(1).getTitle()).isEqualTo("Test Title2");
+        assertThat(boards.get(1).getContent()).isEqualTo("Test Content2");
+    }
+
     static Member getNewMember() {
         return Member.builder()
                 .username("Test")
