@@ -132,6 +132,31 @@ class BoardServiceTest {
                 .hasMessage("존재하지 않는 회원입니다.");
     }
 
+    @DisplayName("존재하지 않는 게시글을 삭제하려고 할 때 예외가 발생한다.")
+    @Test
+    void updateBoardThrowExceptionCausedByDuplicateId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = Board.builder()
+                .title("Title")
+                .content("Content")
+                .member(member)
+                .build();
+        boardRepository.save(board);
+
+        BoardUpdateRequestDto updateDto = BoardUpdateRequestDto.builder()
+                .title("Updated Title")
+                .content("Updated Content")
+                .build();
+
+        Long invalidBoardID = 999L;
+
+        assertThatThrownBy(() -> boardService.updateBoard(member.getId(), invalidBoardID, updateDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 게시글을 찾을 수 없습니다.");
+    }
+
     @DisplayName("특정 게시글을 삭제한다.")
     @Test
     void deleteBoard() {
@@ -150,6 +175,46 @@ class BoardServiceTest {
         boardService.deleteBoard(member.getId(), savedBoard.getId());
 
         assertThat(boardRepository.findById(savedBoard.getId())).isEmpty();
+    }
+
+    @DisplayName("존재하지 않는 회원으로 게시글을 삭제하려고 할 때 예외가 발생한다.")
+    @Test
+    void deleteBoardMemberIdThrowExceptionCausedByDuplicateId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = Board.builder()
+                .title("Title")
+                .content("Content")
+                .member(member)
+                .build();
+        boardRepository.save(board);
+
+        Long invalidMemberId = 999L;
+
+        assertThatThrownBy(() -> boardService.deleteBoard(invalidMemberId, board.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
+    }
+
+    @DisplayName("존재하지 않는 게시글을 삭제하려고 할 때 예외가 발생한다.")
+    @Test
+    void deleteBoardThrowExceptionCausedByDuplicateId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = Board.builder()
+                .title("Title")
+                .content("Content")
+                .member(member)
+                .build();
+        boardRepository.save(board);
+
+        Long invalidBoardID = 999L;
+
+        assertThatThrownBy(() -> boardService.deleteBoard(member.getId(), invalidBoardID))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 게시글을 찾을 수 없습니다.");
     }
 
     static Member getNewMember() {
