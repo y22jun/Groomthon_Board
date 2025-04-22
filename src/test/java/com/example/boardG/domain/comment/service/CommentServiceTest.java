@@ -3,6 +3,7 @@ package com.example.boardG.domain.comment.service;
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
 import com.example.boardG.domain.comment.dto.CommentSaveRequestDto;
+import com.example.boardG.domain.comment.dto.CommentUpdateRequestDto;
 import com.example.boardG.domain.comment.entity.Comment;
 import com.example.boardG.domain.comment.repository.CommentRepository;
 import com.example.boardG.domain.member.entity.Member;
@@ -105,6 +106,119 @@ class CommentServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 게시글을 찾을 수 없습니다.");
 
+    }
+
+    @DisplayName("특정 게시글 안 특정 댓글을 수정합니다.")
+    @Test
+    void updateComment() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Comment saveComment = commentRepository.findAll().get(0);
+
+        CommentUpdateRequestDto commentUpdateRequestDto = CommentUpdateRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content1")
+                .build();
+
+        commentService.updateComment(saveComment.getId(), board.getId(), commentUpdateRequestDto);
+
+        Comment updatedComment = commentRepository.findById(saveComment.getId()).orElseThrow();
+        assertThat(updatedComment.getContent()).isEqualTo("Test Comment Content1");
+    }
+
+    @DisplayName("존재하지 않는 회원으로 댓글을 수정하려고 할 때 예외가 발생한다.")
+    @Test
+    void updateCommentWithInvalidMemberId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Comment saveComment = commentRepository.findAll().get(0);
+
+        Long invalidMemberId = 999L;
+
+        CommentUpdateRequestDto commentUpdateRequestDto = CommentUpdateRequestDto.builder()
+                .memberId(invalidMemberId)
+                .content("Test Comment Content1")
+                .build();
+
+        assertThatThrownBy(() -> commentService.updateComment(saveComment.getId(), board.getId(), commentUpdateRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("회원을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("존재하지 않는 게시글에 댓글을 수정하려고 할 때 예외가 발생한다.")
+    @Test
+    void updateCommentWithInvalidBoardId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Comment saveComment = commentRepository.findAll().get(0);
+
+        Long invalidBoardId = 999L;
+
+        CommentUpdateRequestDto commentUpdateRequestDto = CommentUpdateRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content1")
+                .build();
+
+        assertThatThrownBy(() -> commentService.updateComment(saveComment.getId(), invalidBoardId, commentUpdateRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 게시글을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("특정 게시글 안에 존재하지 않는 댓글을 수정하려고 할 때 예외가 발생한다.")
+    @Test
+    void updateCommentWithInvalidCommentId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Long invalidCommentId = 999L;
+
+        CommentUpdateRequestDto commentUpdateRequestDto = CommentUpdateRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content1")
+                .build();
+
+        assertThatThrownBy(() -> commentService.updateComment(invalidCommentId, board.getId(), commentUpdateRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 댓글을 찾을 수 없습니다.");
     }
 
     static Member getNewMember() {
