@@ -2,6 +2,7 @@ package com.example.boardG.domain.board.controller;
 
 import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
+import com.example.boardG.domain.board.dto.BoardUpdateRequestDto;
 import com.example.boardG.domain.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,12 @@ public class BoardController {
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
         BoardInfoRequestDto boardInfoRequestDto = boardService.getBoardInfo(boardId);
         return ResponseEntity.ok(boardInfoRequestDto);
+    }
+
+    @PutMapping("/{boardId}")
+    public ResponseEntity<?> updateBoard(@PathVariable Long boardId, @RequestBody BoardUpdateRequestDto boardUpdateRequestDto) {
+        boardService.updateBoard(boardUpdateRequestDto.memberId(), boardId, boardUpdateRequestDto);
+        return ResponseEntity.ok("게시판 수정 성공");
     }
 
 }

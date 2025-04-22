@@ -2,6 +2,7 @@ package com.example.boardG.domain.board.service;
 
 import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
+import com.example.boardG.domain.board.dto.BoardUpdateRequestDto;
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
 import com.example.boardG.domain.member.entity.Member;
@@ -41,6 +42,18 @@ public class BoardService {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .build();
+    }
+
+    @Transactional
+    public void updateBoard(Long memberId, Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원압니다."));
+
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다"));
+
+        board.updateBoard(boardUpdateRequestDto.title(), boardUpdateRequestDto.content());
+
     }
 
 }
