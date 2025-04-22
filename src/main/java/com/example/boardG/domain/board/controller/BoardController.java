@@ -1,5 +1,6 @@
 package com.example.boardG.domain.board.controller;
 
+import com.example.boardG.domain.board.dto.BoardDeleteRequestDto;
 import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
 import com.example.boardG.domain.board.dto.BoardUpdateRequestDto;
@@ -31,6 +32,12 @@ public class BoardController {
     public ResponseEntity<?> updateBoard(@PathVariable Long boardId, @RequestBody BoardUpdateRequestDto boardUpdateRequestDto) {
         boardService.updateBoard(boardUpdateRequestDto.memberId(), boardId, boardUpdateRequestDto);
         return ResponseEntity.ok("게시판 수정 성공");
+    }
+
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, @RequestBody BoardDeleteRequestDto boardDeleteRequestDto) {
+        boardService.deleteBoard(boardDeleteRequestDto.memberId(), boardId);
+        return ResponseEntity.ok("게시판 삭제 성공");
     }
 
 }

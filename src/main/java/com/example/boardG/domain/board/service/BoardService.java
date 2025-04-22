@@ -53,7 +53,17 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다"));
 
         board.updateBoard(boardUpdateRequestDto.title(), boardUpdateRequestDto.content());
+    }
 
+    @Transactional
+    public void deleteBoard(Long memberId, Long boardId) {
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+
+        boardRepository.delete(board);
     }
 
 }

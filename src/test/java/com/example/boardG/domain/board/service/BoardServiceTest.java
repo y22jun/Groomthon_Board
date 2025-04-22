@@ -1,5 +1,6 @@
 package com.example.boardG.domain.board.service;
 
+import com.example.boardG.domain.board.dto.BoardDeleteRequestDto;
 import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
 import com.example.boardG.domain.board.dto.BoardUpdateRequestDto;
@@ -129,6 +130,26 @@ class BoardServiceTest {
         assertThatThrownBy(() -> boardService.updateBoard(invalidMemberId, board.getId(), updateDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
+    }
+
+    @DisplayName("특정 게시글을 삭제한다.")
+    @Test
+    void deleteBoard() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        BoardSaveRequestDto boardSaveRequestDto = BoardSaveRequestDto.builder()
+                .memberId(member.getId())
+                .title("Original Title")
+                .content("Original Content")
+                .build();
+
+        boardService.createBoard(member.getId(), boardSaveRequestDto);
+        Board savedBoard = boardRepository.findAll().get(0);
+
+        boardService.deleteBoard(member.getId(), savedBoard.getId());
+
+        assertThat(boardRepository.findById(savedBoard.getId())).isEmpty();
     }
 
     static Member getNewMember() {
