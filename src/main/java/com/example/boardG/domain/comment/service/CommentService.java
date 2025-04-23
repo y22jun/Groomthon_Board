@@ -2,6 +2,7 @@ package com.example.boardG.domain.comment.service;
 
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
+import com.example.boardG.domain.comment.dto.CommentDeleteRequestDto;
 import com.example.boardG.domain.comment.dto.CommentSaveRequestDto;
 import com.example.boardG.domain.comment.dto.CommentUpdateRequestDto;
 import com.example.boardG.domain.comment.entity.Comment;
@@ -48,5 +49,19 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
 
         comment.updateContent(commentUpdateRequestDto.content());
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, Long boardId, CommentDeleteRequestDto commentDeleteRequestDto) {
+        memberRepository.findById(commentDeleteRequestDto.memberId())
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
+
+        commentRepository.delete(comment);
     }
 }

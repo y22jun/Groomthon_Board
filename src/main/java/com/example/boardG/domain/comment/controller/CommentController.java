@@ -1,5 +1,6 @@
 package com.example.boardG.domain.comment.controller;
 
+import com.example.boardG.domain.comment.dto.CommentDeleteRequestDto;
 import com.example.boardG.domain.comment.dto.CommentSaveRequestDto;
 import com.example.boardG.domain.comment.dto.CommentUpdateRequestDto;
 import com.example.boardG.domain.comment.service.CommentService;
@@ -23,5 +24,11 @@ public class CommentController {
     public ResponseEntity<?> updateComment(@PathVariable Long commentId, @PathVariable Long boardId, @RequestBody CommentUpdateRequestDto commentUpdateRequestDto) {
         commentService.updateComment(commentId, boardId, commentUpdateRequestDto);
         return ResponseEntity.ok("댓글 수정 성공");
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId, @PathVariable Long boardId, @RequestBody CommentDeleteRequestDto commentDeleteRequestDto) {
+        commentService.deleteComment(commentId, boardId, commentDeleteRequestDto);
+        return ResponseEntity.ok("댓글 삭제 성공");
     }
 }

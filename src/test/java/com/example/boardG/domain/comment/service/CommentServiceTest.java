@@ -2,6 +2,7 @@ package com.example.boardG.domain.comment.service;
 
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
+import com.example.boardG.domain.comment.dto.CommentDeleteRequestDto;
 import com.example.boardG.domain.comment.dto.CommentSaveRequestDto;
 import com.example.boardG.domain.comment.dto.CommentUpdateRequestDto;
 import com.example.boardG.domain.comment.entity.Comment;
@@ -16,8 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class CommentServiceTest {
@@ -219,6 +219,118 @@ class CommentServiceTest {
         assertThatThrownBy(() -> commentService.updateComment(invalidCommentId, board.getId(), commentUpdateRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 댓글을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("특정 게시글 안 특정 댓글을 삭제합니다.")
+    @Test
+    void deleteComment() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Comment saveComment = commentRepository.findAll().get(0);
+
+        CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
+                .memberId(member.getId())
+                .build();
+
+        commentService.deleteComment(saveComment.getId(), board.getId(), commentDeleteRequestDto);
+
+        assertThat(commentRepository.findById(saveComment.getId())).isEmpty();
+    }
+
+    @DisplayName("존재하지 않는 회원으로 특정 댓글을 삭제하려고 할 때 예외를 발생한다.")
+    @Test
+    void deleteCommentWithInvalidMemberId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Comment saveComment = commentRepository.findAll().get(0);
+
+        Long invalidMemberId = 999L;
+
+        CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
+                .memberId(invalidMemberId)
+                .build();
+
+        assertThatThrownBy(() -> commentService.deleteComment(saveComment.getId(), board.getId(), commentDeleteRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("회원을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("존재하지 않는 게시글에 특정 댓글을 삭제하려고 할 때 예외를 발생한다.")
+    @Test
+    void deleteCommentWithInvalidBoardId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Comment saveComment = commentRepository.findAll().get(0);
+
+        CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
+                .memberId(member.getId())
+                .build();
+
+        Long invalidBoardId = 999L;
+
+        assertThatThrownBy(() -> commentService.deleteComment(saveComment.getId(), invalidBoardId, commentDeleteRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 게시글을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("특정 게시글 안에 존재하지 않는 댓글을 삭제하려고 할 때 예외가 발생한다.")
+    @Test
+    void deleteCommentWithInvalidCommentId() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto commentSaveRequestDto = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("Test Comment Content")
+                .build();
+        commentService.saveComment(board.getId(), commentSaveRequestDto);
+
+        Long invalidCommentId = 999L;
+
+        CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
+                .memberId(member.getId())
+                .build();
+
+        assertThatThrownBy(() -> commentService.deleteComment(invalidCommentId, board.getId(), commentDeleteRequestDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 댓글을 찾을 수 없습니다.");
+
+
+
+
     }
 
     static Member getNewMember() {
