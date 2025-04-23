@@ -3,6 +3,7 @@ package com.example.boardG.domain.comment.service;
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
 import com.example.boardG.domain.comment.dto.CommentDeleteRequestDto;
+import com.example.boardG.domain.comment.dto.CommentInfoResponseDto;
 import com.example.boardG.domain.comment.dto.CommentSaveRequestDto;
 import com.example.boardG.domain.comment.dto.CommentUpdateRequestDto;
 import com.example.boardG.domain.comment.entity.Comment;
@@ -12,6 +13,8 @@ import com.example.boardG.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -63,5 +66,18 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
 
         commentRepository.delete(comment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentInfoResponseDto> getComments(Long boardId) {
+        List<Comment> comments = commentRepository.findAllByBoardId(boardId);
+
+        return comments.stream()
+                .map(comment -> CommentInfoResponseDto.builder()
+                        .boardId(comment.getBoard().getId())
+                        .memberId(comment.getMember().getId())
+                        .content(comment.getContent())
+                        .build())
+                .toList();
     }
 }

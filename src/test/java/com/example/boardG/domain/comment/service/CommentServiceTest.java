@@ -3,6 +3,7 @@ package com.example.boardG.domain.comment.service;
 import com.example.boardG.domain.board.entity.Board;
 import com.example.boardG.domain.board.repository.BoardRepository;
 import com.example.boardG.domain.comment.dto.CommentDeleteRequestDto;
+import com.example.boardG.domain.comment.dto.CommentInfoResponseDto;
 import com.example.boardG.domain.comment.dto.CommentSaveRequestDto;
 import com.example.boardG.domain.comment.dto.CommentUpdateRequestDto;
 import com.example.boardG.domain.comment.entity.Comment;
@@ -327,6 +328,35 @@ class CommentServiceTest {
         assertThatThrownBy(() -> commentService.deleteComment(invalidCommentId, board.getId(), commentDeleteRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 댓글을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("특정 게시글 안에 있는 모든 댓글을 조회합니다.")
+    @Test
+    void getComments() {
+        Member member = getNewMember();
+        memberRepository.save(member);
+
+        Board board = getNewBoard(member);
+        boardRepository.save(board);
+
+        CommentSaveRequestDto comment1 = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("첫 번째 댓글")
+                .build();
+
+        CommentSaveRequestDto comment2 = CommentSaveRequestDto.builder()
+                .memberId(member.getId())
+                .content("두 번째 댓글")
+                .build();
+
+        commentService.saveComment(board.getId(), comment1);
+        commentService.saveComment(board.getId(), comment2);
+
+        List<CommentInfoResponseDto> comments = commentService.getComments(board.getId());
+
+        assertThat(comments.size()).isEqualTo(2);
+        assertThat(comments).extracting("content")
+                .containsExactlyInAnyOrder("첫 번째 댓글", "두 번째 댓글");
     }
 
     static Member getNewMember() {
