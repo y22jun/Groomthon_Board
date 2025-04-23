@@ -327,10 +327,6 @@ class CommentServiceTest {
         assertThatThrownBy(() -> commentService.deleteComment(invalidCommentId, board.getId(), commentDeleteRequestDto))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 댓글을 찾을 수 없습니다.");
-
-
-
-
     }
 
     static Member getNewMember() {
