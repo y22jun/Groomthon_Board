@@ -113,11 +113,7 @@ class BoardServiceTest {
         Member member = getNewMember();
         memberRepository.save(member);
 
-        Board board = Board.builder()
-                .title("Title")
-                .content("Content")
-                .member(member)
-                .build();
+        Board board = getNewBoard(member);
         boardRepository.save(board);
 
         BoardUpdateRequestDto updateDto = BoardUpdateRequestDto.builder()
@@ -138,11 +134,7 @@ class BoardServiceTest {
         Member member = getNewMember();
         memberRepository.save(member);
 
-        Board board = Board.builder()
-                .title("Title")
-                .content("Content")
-                .member(member)
-                .build();
+        Board board = getNewBoard(member);
         boardRepository.save(board);
 
         BoardUpdateRequestDto updateDto = BoardUpdateRequestDto.builder()
@@ -183,11 +175,7 @@ class BoardServiceTest {
         Member member = getNewMember();
         memberRepository.save(member);
 
-        Board board = Board.builder()
-                .title("Title")
-                .content("Content")
-                .member(member)
-                .build();
+        Board board = getNewBoard(member);
         boardRepository.save(board);
 
         Long invalidMemberId = 999L;
@@ -203,11 +191,7 @@ class BoardServiceTest {
         Member member = getNewMember();
         memberRepository.save(member);
 
-        Board board = Board.builder()
-                .title("Title")
-                .content("Content")
-                .member(member)
-                .build();
+        Board board = getNewBoard(member);
         boardRepository.save(board);
 
         Long invalidBoardID = 999L;
@@ -252,6 +236,14 @@ class BoardServiceTest {
                 .username("Test")
                 .password("Test")
                 .email("Test@test.com")
+                .build();
+    }
+
+    static Board getNewBoard(Member member) {
+        return Board.builder()
+                .title("Test Title")
+                .content("Test Content")
+                .member(member)
                 .build();
     }
 
