@@ -1,6 +1,5 @@
 package com.example.boardG.domain.board.service;
 
-import com.example.boardG.domain.board.dto.BoardDeleteRequestDto;
 import com.example.boardG.domain.board.dto.BoardInfoRequestDto;
 import com.example.boardG.domain.board.dto.BoardSaveRequestDto;
 import com.example.boardG.domain.board.dto.BoardUpdateRequestDto;
