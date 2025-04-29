@@ -13,6 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("api/v1/comments/{boardId}")
+@RestController
 public class CommentController {
 
     private final CommentService commentService;
